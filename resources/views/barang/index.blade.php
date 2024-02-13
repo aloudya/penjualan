@@ -5,7 +5,7 @@
 <div class="col-md-12">
     <div class="card">
         <div class="card-header">
-            <btn class="btn btn-lg btn-success btnTambahBarang" data-bs-target='#modalForm' data-bs-toggle="modal" attr-href="{{route('barang.tambah')}}"><i class="bi bi-plus"></i>Tambah</btn>
+            <btn class="btn btn-success btnTambahBarang" data-bs-target='#modalForm' data-bs-toggle="modal" attr-href="{{route('barang.tambah')}}"><i class="bi bi-plus"></i>Tambah</btn>
             Daftar barang
         </div>
         <div class="card-body">
@@ -27,6 +27,7 @@
 
         </div>
     </div>
+
     <!-- Bagian Modal -->
     <div class="modal fade" id="modalForm" data-bs-backdrop="static" data-bs-keyboards="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -51,7 +52,7 @@
 @section('footer')
 <script type="module">
     var table = $('.DataTable').DataTable({
-        proceesing: true,
+        processing: true,
         serverSide: true,
         ajax: "{!!route('barang.data')!!}",
         columns: [{
@@ -69,10 +70,25 @@
             },
             {
                 render: function(data, type, row) {
-                    return "<btn class='btn btn-primary'><i class='bi bi-pencil-square'></i> Edit</btn> <btn class='btn btn-danger'><i class='bi bi-trash3'></i> Hapus</btn>";
+                    return "<btn class='btn btn-primary editBtn' data-bs-toggle='modal' data-bs-target='#modalForm' attr-href='{!!url('/barang/edit/" + row.id_barang + "')!!}'><i class='bi bi-pencil-square'></i> Edit</btn> <btn class='btn btn-danger'><i class='bi bi-trash3'></i> Hapus</btn>";
                 }
             },
         ]
+    });
+
+    // Edit Callback
+    $('.DataTable tbody').on('click', '.editBtn', function(event) {
+        let modalForm = document.getElementById('modalForm');
+        modalForm.addEventListener('shown.bs.modal', function(event) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            let link = event.relatedTarget.getAttribute('attr-href');
+
+            axios.get(link).then(response => {
+                $('#modalForm .modal-body').html(response.data);
+                $('.modal-header .modal-title').html('Edit Data Barang');
+            });
+        });
     });
 
     $('.btnTambahBarang').on('click', function(a) {
@@ -83,24 +99,22 @@
             event.stopImmediatePropagation();
             const link = event.relatedTarget.getAttribute('attr-href');
             const modalData = document.querySelector('#modalForm .modal-body');
-            $(".modal-header .modal-title").html("Tambah data barang baru");
 
             axios.get(link).then(response => {
                 $('#modalForm .modal-body').html(response.data);
+                $('.modal-header .modal-title').html("Tambah Data Barang");
             });
-
-
-            /**
-             * Contoh yang menggunakan ajax!
-             $.ajax({
-                 url: link,
-                 method: 'GET',
-                 success: function(response) {
-                     $('#modalForm .modal-body').html(response);
-                 }
-             });
-             */
         });
     });
+    /**
+     * Contoh yang menggunakan ajax!
+     $.ajax({
+         url: link,
+         method: 'GET',
+         success: function(response) {
+             $('#modalForm .modal-body').html(response);
+         }
+     });
+     */
 </script>
 @endsection

@@ -46,7 +46,14 @@ class BarangController extends Controller
     }
     public function update(Request $request)
     {
-        /* Method ini hanya bisa diakses dengan HTTP Method GET */
+        /**
+         * Method ini akan menampilkan form update/ubah data
+         * yang akan dikirim ke method simpan
+         */
+        $data = [
+            'barangDetil' => BarangModel::where('id_barang', $request->id_barang)->first()
+        ];
+        return view('barang.edit', $data);
     }
     public function delete(Request $request)
     {
