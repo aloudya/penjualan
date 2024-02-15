@@ -51,6 +51,9 @@
 
 @section('footer')
 <script type="module">
+    const barangModal = document.querySelector('#modalForm');
+    const modal = bootstrap.Modal.getOrCreateInstance(barangModal);
+
     var table = $('.DataTable').DataTable({
         processing: true,
         serverSide: true,
@@ -76,7 +79,7 @@
         ]
     });
 
-    // Edit Callback
+    // Edit
     $('.DataTable tbody').on('click', '.editBtn', function(event) {
         let modalForm = document.getElementById('modalForm');
         modalForm.addEventListener('shown.bs.modal', function(event) {
@@ -88,21 +91,98 @@
                 $('#modalForm .modal-body').html(response.data);
                 $('.modal-header .modal-title').html('Edit Data Barang');
             });
+
+            $('.btnSimpanBarang').on('click', function(submitEvent) {
+                submitEvent.stopImmediatePropagation();
+
+                var data = {
+                    'id_barang': $('#idBarang').val(),
+                    'kode_barang': $('#kodeBarang').val(),
+                    'nama_barang': $('#namaBarang').val(),
+                    'harga': $('#hargaBarang').val(),
+                    '_token': "{{csrf_token()}}"
+                }
+
+                if (data.kode_barang !== '' && data.nama_barang !== '' && data.harga !== '') {
+                    axios.put('{{url("/barang/simpan")}}', data)
+                        .then(resp => {
+                            if (resp.data.status == 'success') {
+
+                                modal.hide(); // Close the modal
+                                table.ajax.reload(); // Reload the DataTable
+
+                                // Tampilkan popup berhasil
+                                Swal.fire({
+                                    title: "Berhasil",
+                                    text: resp.data.pesan,
+                                    icon: "success"
+                                });
+                            } else {
+                                // Tampilkan popup gagal
+                                Swal.fire({
+                                    title: "Maaf, kamu gagal",
+                                    text: resp.data.pesan,
+                                    icon: "error"
+                                });
+                            }
+                        });
+                } else {
+                    alert('Data tidak boleh kosong ya :(');
+                }
+            });
         });
     });
 
+    // Tambah
     $('.btnTambahBarang').on('click', function(a) {
-        a.preventDefault();
+        changeHTML('#modalForm', '.modal-title', 'Tambah Data Barang');
         const modalForm = document.getElementById('modalForm');
-        modalForm.addEventListener('shown.bs.modal', function(event) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            const link = event.relatedTarget.getAttribute('attr-href');
-            const modalData = document.querySelector('#modalForm .modal-body');
+
+        modalForm.addEventListener('shown.bs.modal', function(eventTambah) {
+            eventTambah.preventDefault();
+            eventTambah.stopImmediatePropagation();
+            const link = eventTambah.relatedTarget.getAttribute('attr-href');
 
             axios.get(link).then(response => {
                 $('#modalForm .modal-body').html(response.data);
-                $('.modal-header .modal-title').html("Tambah Data Barang");
+            });
+
+            $('.btnSimpanBarang').on('click', function(submitEvent) {
+                submitEvent.stopImmediatePropagation();
+
+                var data = {
+                    'kode_barang': $('#kodeBarang').val(),
+                    'nama_barang': $('#namaBarang').val(),
+                    'harga': $('#hargaBarang').val(),
+                    '_token': "{{csrf_token()}}"
+                }
+
+                if (data.kode_barang !== '' && data.nama_barang !== '' && data.harga !== '') {
+                    axios.post('{{url("/barang/simpan")}}', data)
+                        .then(resp => {
+                            if (resp.data.status == 'success') {
+
+                                modal.hide(); // Close the modal
+                                table.ajax.reload(); // Reload the DataTable
+
+                                // Tampilkan popup berhasil
+                                Swal.fire({
+                                    title: "Berhasil",
+                                    text: resp.data.pesan,
+                                    icon: "success"
+                                });
+                            } else {
+                                // Tampilkan popup gagal
+                                Swal.fire({
+                                    title: "Maaf, kamu gagal",
+                                    text: resp.data.pesan,
+                                    icon: "error"
+                                });
+                            }
+                        });
+                } else {
+                    alert('Data tidak boleh kosong ya :(');
+                }
             });
         });
     });
@@ -116,5 +196,10 @@
          }
      });
      */
+
+    function changeHTML(element, find, text) {
+        $(element).find(find).html();
+        return $(element).find(find).html(text).promise().done()
+    }
 </script>
 @endsection

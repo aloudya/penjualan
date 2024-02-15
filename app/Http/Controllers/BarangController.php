@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BarangStoreRequest;
 use Illuminate\Http\Request;
 use App\Models\BarangModel;
 use Yajra\DataTables\DataTables;
+use Validator;
 
 class BarangController extends Controller
 {
@@ -40,9 +42,54 @@ class BarangController extends Controller
          */
         return view('barang.tambah');
     }
-    public function simpan(Request $request)
+    public function simpan(BarangStoreRequest $request)
     {
         /* Method ini akan menyimpan data yang dikirim dari method tambah */
+        $validated = $request->validated();
+        if ($validated) {
+            /**if (isset($request->id_barang)) {
+                // Mengupdate data
+                $perintah = BarangModel::where('id_barang', $request->id)->update($validated);
+                if ($perintah) {
+                    $pesan = [
+                        'status' => 'success',
+                        'pesan' => 'Data berhasil diupdate!'
+                    ];
+                } else {
+                    $pesan = [
+                        'status' => 'failed',
+                        'pesan' => 'Data gagal diupdate!'
+                    ];
+                }
+            } else {
+                $pesan = [
+                    'status' => 'success',
+                    'pesan' => 'Data gagal ditambahkan, periksa form yang diinput'
+                ];
+            };
+             */
+
+            // Validate untuk menambah data barang
+            $perintah = BarangModel::create($validated);
+
+            if ($perintah) {
+                $pesan = [
+                    'status' => 'success',
+                    'pesan' => 'Data berhasil dibuat!'
+                ];
+            } else {
+                $pesan = [
+                    'status' => 'failed',
+                    'pesan' => 'Data gagal dibuat!'
+                ];
+            }
+        } else {
+            $pesan = [
+                'status' => 'success',
+                'pesan' => 'Data gagal ditambahkan, periksa form yang diinput'
+            ];
+        }
+        return response()->json($pesan);
     }
     public function update(Request $request)
     {

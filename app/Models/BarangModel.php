@@ -12,6 +12,7 @@ class BarangModel extends Model
   protected $table = 'barang';
   protected $primaryKey = 'id_barang';
   protected $fillable = ['nama_barang', 'kode_barang', 'harga'];
+  public $timestamps = false;
 
   public function stok(): HasOne // buat method di model bisa untuk membangun relationship, ...?
   {
