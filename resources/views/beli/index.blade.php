@@ -1,13 +1,13 @@
 @extends('template/template')
-@section('title', 'Data Barang e-Grocery')
+@section('title', 'Riwayat Pembelian Barang')
 
 @section('content')
 <div class="col-md-12">
     <div class="card">
         <div class="card-header">
-            <btn class="btn btn-success btnTambahBarang" data-bs-target='#modalForm' data-bs-toggle="modal"
-                attr-href="{{route('barang.tambah')}}"><i class="bi bi-plus"></i>Tambah</btn>
-            Daftar barang
+            <btn class="btn btn-success btnBeliBarang" data-bs-title="Tambah Stok Barang" data-bs-target='#modalForm'
+                data-bs-toggle="modal" attr-href="{{route('beli.tambah')}}"><i class="bi bi-plus"></i>Tambah Stok Barang
+            </btn>
         </div>
         <div class="card-body">
             <table class="table DataTable table-hovered table-bordered">
@@ -15,7 +15,10 @@
                     <tr>
                         <th>Kode barang</th>
                         <th>Nama barang</th>
-                        <th>Stok</th>
+                        <th>Tanggal</th>
+                        <th>Jumlah</th>
+                        <th>Harga Satuan</th>
+                        <th>Total</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -60,19 +63,32 @@
     var table = $('.DataTable').DataTable({
         processing: true,
         serverSide: true,
-        ajax: "{!!route('barang.data')!!}",
+        ajax: "{!!route('beli.data')!!}",
         columns: [{
-            data: 'kode_barang',
-            name: 'kode_barang',
-        },
-        {
-            data: 'nama_barang',
-            name: 'nama_barang',
+            render: function (data, type, row) {
+                return row.barang.kode_barang;
+            }
         },
         {
             render: function (data, type, row) {
-                return row.stok.jumlah;
+                return row.barang.nama_barang;
             }
+        },
+        {
+            data: 'tanggal_beli',
+            name: 'tanggal_beli',
+        },
+        {
+            data: 'jumlah_beli',
+            name: 'jumlah_beli',
+        },
+        {
+            data: 'harga_beli_satuan',
+            name: 'harga_beli_satuan',
+        },
+        {
+            data: 'total_harga_beli',
+            name: 'total_harga_beli',
         },
         {
             render: function (data, type, row) {
@@ -240,23 +256,10 @@
                         'icon': 'error'
                     });
                 }
+
             });
         });
     });
-    /**
-     * Contoh yang menggunakan ajax!
-     $.ajax({
-         url: link,
-         method: 'GET',
-         success: function(response) {
-             $('#modalForm .modal-body').html(response);
-         }
-     });
-     */
 
-    function changeHTML(element, find, text) {
-        $(element).find(find).html();
-        return $(element).find(find).html(text).promise().done()
-    }
 </script>
 @endsection

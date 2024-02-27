@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BarangController;
+use App\Http\Controllers\BeliController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,4 +25,11 @@ Route::prefix('/barang')->group(function () {
     Route::get('/tambah', [BarangController::class, 'tambah'])->name('barang.tambah');
     Route::get('/edit/{id_barang}', [BarangController::class, 'update'])->name('barang.edit');
     Route::post('/simpan', [BarangController::class, 'simpan'])->name('barang.simpan');
+    Route::post('/hapus', [BarangController::class, 'delete'])->name('barang.hapus');
+});
+
+Route::prefix('/beli')->group(function () {
+    Route::get('/', [BeliController::class, 'index'])->name('beli.index');
+    Route::get('/data', [BeliController::class, 'index'])->name('beli.data');
+    Route::get('/tambah', [BeliController::class, 'tambah'])->name('beli.tambah');
 });

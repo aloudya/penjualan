@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\BeliModel;
+use App\Http\Requests\StoreRequestBeli;
+use Yajra\DataTables\DataTables;
+use Validator;
 
 class BeliController extends Controller
 {
@@ -20,15 +23,19 @@ class BeliController extends Controller
         $this->beliModel = new BeliModel();
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        /* Menampilkan daftar barang yang ada pada table barang dan dikonversi ke dalam format table menggunakan template yang disediakan oleh data table. */
-        $data = [
-            'beliList' => $this->beliModel::all()
-        ];
+        if ($request->ajax()) {
+            $data = BeliModel::with('barang')->get();
+            return DataTables::of($data)->toJson();
 
-        /* Tampilkan $data ke dalam view file beli/list.blade.php */
-        return view('beli.list', $data);
+        }
+        return view('beli.index');
+    }
+
+    public function tambah()
+    {
+        // Menampilkan form tambah
     }
 
     public function beli()

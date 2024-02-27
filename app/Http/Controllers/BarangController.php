@@ -46,49 +46,46 @@ class BarangController extends Controller
     {
         /* Method ini akan menyimpan data yang dikirim dari method tambah */
         $validated = $request->validated();
-        if ($validated) {
-            /**if (isset($request->id_barang)) {
-                // Mengupdate data
-                $perintah = BarangModel::where('id_barang', $request->id)->update($validated);
-                if ($perintah) {
+        if ($validated):
+            if (isset($request->id_barang)):
+
+                // Proses update
+                $perintah = BarangModel::where('id_barang', $request->id_barang)->update($validated);
+                if ($perintah):
                     $pesan = [
                         'status' => 'success',
-                        'pesan' => 'Data berhasil diupdate!'
+                        'pesan' => 'Datamu berhasil diperbarui'
                     ];
-                } else {
+                else:
                     $pesan = [
-                        'status' => 'failed',
-                        'pesan' => 'Data gagal diupdate!'
+                        'status' => 'error',
+                        'pesan' => 'Datamu gagal diperbarui'
                     ];
-                }
-            } else {
-                $pesan = [
-                    'status' => 'success',
-                    'pesan' => 'Data gagal ditambahkan, periksa form yang diinput'
-                ];
-            };
-             */
+                endif;
 
-            // Validate untuk menambah data barang
-            $perintah = BarangModel::create($validated);
+            else:
 
-            if ($perintah) {
-                $pesan = [
-                    'status' => 'success',
-                    'pesan' => 'Data berhasil dibuat!'
-                ];
-            } else {
-                $pesan = [
-                    'status' => 'failed',
-                    'pesan' => 'Data gagal dibuat!'
-                ];
-            }
-        } else {
+                // Proses tambah data baru
+                $perintah = BarangModel::create($validated);
+                if ($perintah):
+                    $pesan = [
+                        'status' => 'success',
+                        'pesan' => 'Data barang baru berhasil ditambahkan'
+                    ];
+                else:
+                    $pesan = [
+                        'status' => 'error',
+                        'pesan' => 'Data barang baru gagal ditambahkan'
+                    ];
+                endif;
+            endif;
+
+        else:
             $pesan = [
-                'status' => 'success',
-                'pesan' => 'Data gagal ditambahkan, periksa form yang diinput'
+                'status' => 'error',
+                'pesan' => 'Proses validasi gagal'
             ];
-        }
+        endif;
         return response()->json($pesan);
     }
     public function update(Request $request)
@@ -105,6 +102,19 @@ class BarangController extends Controller
     public function delete(Request $request)
     {
         /* Method ini hanya bisa diakses dengan HTTP Method POST */
+        $aksiHapus = BarangModel::where('id_barang', $request->id_barang)->delete();
+        if ($aksiHapus):
+            $pesan = [
+                'status' => 'success',
+                'pesan' => 'Data barang berhasil dihapus'
+            ];
+        else:
+            $pesan = [
+                'status' => 'error',
+                'pesan' => 'Data barang gagal dihapus'
+            ];
+        endif;
+        return response()->json($pesan);
     }
 
     public function dataBarang(Request $request)
@@ -112,7 +122,7 @@ class BarangController extends Controller
         /**
          * Method ini akan menjadi endpoint API untuk datatable serverside.
          */
-        if ($request->ajax()) :
+        if ($request->ajax()):
             $data = $this->barangModel->with('stok')->get();
             return DataTables::of($data)->toJson();
         endif;
